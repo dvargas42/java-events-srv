@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: events-srv
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DB_URL: jdbc:mysql://mysql:3306/events-db
+      SPRING_DB_USERNAME: root
+      SPRING_DB_PASSWORD: mysql
+      SPRING_JPA_DDL_AUTO: none
+    ports:
+      - "8080:8080"
+    networks:
+      - network
+  mysql:
+    image: mysql:8.0
+    container_name: events-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: events-db
+    ports:
+      - "3306:3306"
+    networks:
+      - network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+volumes:
+  mysql_data:
+
+networks:
+  network: 
