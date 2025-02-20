@@ -1,7 +1,5 @@
 package br.com.nlw.events.controller;
 
-import br.com.nlw.events.dto.ErrorMessage;
-import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.model.Event;
 import br.com.nlw.events.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/event")
-public class EventController {
+public class EventController implements IEventController {
 
     @Autowired
     private EventService service;
