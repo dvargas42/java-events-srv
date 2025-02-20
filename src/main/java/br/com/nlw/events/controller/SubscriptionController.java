@@ -2,18 +2,22 @@ package br.com.nlw.events.controller;
 
 import br.com.nlw.events.dto.ErrorMessage;
 import br.com.nlw.events.dto.SubscriptionOut;
+import br.com.nlw.events.dto.SubscriptionRankingItem;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 import br.com.nlw.events.model.User;
 import br.com.nlw.events.service.SubscriptionService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/subscription")
-public class SubscriptionController {
+public class SubscriptionController implements ISubscriptionController {
 
     @Autowired
     private SubscriptionService service;
@@ -38,8 +42,12 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{prettyName}/ranking")
-    public ResponseEntity<?> generateRankingBGyEvent(@PathVariable String prettyName) {
+    public ResponseEntity<?> generateRankingByEvent(@PathVariable String prettyName) {
         try {
+            List<SubscriptionRankingItem> completeRanking = service.getCompleteRanking(prettyName);
+            if (completeRanking.size() < 3) {
+                return ResponseEntity.ok(service.getCompleteRanking(prettyName));
+            }
             return ResponseEntity.ok(service.getCompleteRanking(prettyName).subList(0,3));
         } catch (EventNotFoundException ex) {
             return ResponseEntity.status(404).body(new ErrorMessage(ex.getMessage()));
@@ -47,7 +55,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{prettyName}/ranking/{userId}")
-    public ResponseEntity<?> generateRankingBGyEvent(@PathVariable String prettyName, @PathVariable Integer userId) {
+    public ResponseEntity<?> generateRankingByUserId(@PathVariable String prettyName, @PathVariable Integer userId) {
         try {
             return ResponseEntity.ok(service.getRankingByUser(prettyName, userId));
         } catch (Exception ex) {
