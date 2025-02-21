@@ -1,12 +1,25 @@
 package br.com.nlw.events.controller;
 
-import br.com.nlw.events.model.Event;
-import br.com.nlw.events.service.EventService;
+import java.net.URI;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
+import br.com.nlw.events.dto.ErrorMessage;
+import br.com.nlw.events.dto.EventIn;
+import br.com.nlw.events.dto.EventOut;
+import br.com.nlw.events.exception.EventConflictException;
+import br.com.nlw.events.model.Event;
+import br.com.nlw.events.service.EventService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/event")
@@ -16,8 +29,15 @@ public class EventController implements IEventController {
     private EventService service;
 
     @PostMapping
-    public Event addNewEvent(@RequestBody Event newEvent) {
-        return service.AddeNewEvent(newEvent);
+    public ResponseEntity<?> addNewEvent(@RequestBody @Valid EventIn eventIn, UriComponentsBuilder uriBuilder) {
+        EventOut eventOut = null;
+        try {
+            eventOut = service.addNewEvent(eventIn);
+        } catch (EventConflictException ex) {
+            return ResponseEntity.status(409).body(new ErrorMessage(ex.getMessage()));
+        }
+        URI uri = uriBuilder.path("/event/{id}").buildAndExpand(eventOut.eventId()).toUri();
+        return ResponseEntity.created(uri).body(eventOut);
     }
 
     @GetMapping
