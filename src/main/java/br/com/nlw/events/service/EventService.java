@@ -32,8 +32,12 @@ public class EventService {
         return eventMapper.toEventOut(eventRepo.save(event));
     }
 
-    public List<Event> getAllEvents() {
-        return (List<Event>) eventRepo.findAll();
+    public List<EventOut> getAllEvents() {
+        List<EventOut> events = ((List<Event>) eventRepo.findAll()).stream()
+                .map(event -> {
+                    return eventMapper.toEventOut(event);
+                }).toList();
+        return events;
     }
 
     public Event getByPrettyName(String prettyName) {
