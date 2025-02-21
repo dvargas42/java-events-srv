@@ -1,11 +1,16 @@
 package br.com.nlw.events.service;
 
-import br.com.nlw.events.model.Event;
-import br.com.nlw.events.repository.EventRepo;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import br.com.nlw.events.dto.EventIn;
+import br.com.nlw.events.dto.EventOut;
+import br.com.nlw.events.exception.EventConflictException;
+import br.com.nlw.events.mapper.IEventMapper;
+import br.com.nlw.events.model.Event;
+import br.com.nlw.events.repository.EventRepo;
 
 @Service
 public class EventService {
@@ -13,9 +18,18 @@ public class EventService {
     @Autowired
     private EventRepo eventRepo;
 
-    public Event AddeNewEvent(Event event) {
-        event.setPrettyName(event.getTitle().toLowerCase().replaceAll(" ", "-"));
-        return eventRepo.save(event);
+    @Autowired
+    private IEventMapper eventMapper;
+
+    public EventOut addNewEvent(EventIn eventIn) {
+        String prettyName = eventIn.title().toLowerCase().replaceAll(" ", "-");
+        Event foundEvent = eventRepo.findByPrettyName(prettyName);
+        if (foundEvent != null) {
+            throw new EventConflictException("Já existe cadastro para o evento " + foundEvent.getTitle());
+        }
+        Event event = eventMapper.toEntity(eventIn);
+        event.setPrettyName(prettyName);
+        return eventMapper.toEventOut(eventRepo.save(event));
     }
 
     public List<Event> getAllEvents() {
