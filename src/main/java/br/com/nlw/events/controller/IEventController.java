@@ -1,7 +1,5 @@
 package br.com.nlw.events.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,7 +30,7 @@ public interface IEventController {
         }),
         @ApiResponse(responseCode = "404", description = "Event not found")
     })
-    List<Event> getAllEvents();
+    ResponseEntity<?> getAllEvents();
 
     @Operation(summary = "Event search by prettyName", description = "This functionality is responsible for search a event by prettyName")
     @ApiResponses({
@@ -42,6 +40,4 @@ public interface IEventController {
         @ApiResponse(responseCode = "404", description = "Event not found")
     })
     ResponseEntity<?> getByPrettyName(String id);
-
-
 }

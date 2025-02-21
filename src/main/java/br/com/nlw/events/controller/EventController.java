@@ -41,8 +41,8 @@ public class EventController implements IEventController {
     }
 
     @GetMapping
-    public List<Event> getAllEvents() {
-        return service.getAllEvents();
+    public ResponseEntity<List<EventOut>> getAllEvents() {
+        return ResponseEntity.ok().body(service.getAllEvents());
     }
 
     @GetMapping("/{prettyName}")
@@ -51,7 +51,6 @@ public class EventController implements IEventController {
         if (event != null) {
             return ResponseEntity.ok().body(event);
         }
-
         return ResponseEntity.notFound().build();
     }
 }
