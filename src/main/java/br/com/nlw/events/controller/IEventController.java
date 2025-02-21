@@ -3,7 +3,9 @@ package br.com.nlw.events.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.nlw.events.dto.EventIn;
 import br.com.nlw.events.model.Event;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,7 +23,7 @@ public interface IEventController {
             @Content(schema = @Schema(implementation = Event.class))
         })
     })
-    Event addNewEvent(Event newEvent);
+    ResponseEntity<?> addNewEvent(EventIn eventIn, UriComponentsBuilder uriBuilder);
 
     @Operation(summary = "Event search all", description = "This functionality is responsible for search all events")
     @ApiResponses({
