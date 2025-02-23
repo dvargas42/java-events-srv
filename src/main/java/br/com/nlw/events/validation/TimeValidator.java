@@ -1,16 +1,15 @@
 package br.com.nlw.events.validation;
 
-import br.com.nlw.events.exception.EventConflictException;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-
-import java.io.IOException;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class TimeValidator extends JsonDeserializer<LocalTime> implements ContextualDeserializer {
 
@@ -44,16 +43,16 @@ public class TimeValidator extends JsonDeserializer<LocalTime> implements Contex
             }
 
             if (pattern.length() >= 2 && Integer.parseInt(value.substring(0,2)) > 23) {
-                throw new EventConflictException("Invalid value for hour (valid values 00 - 23)");
+                throw new NumberFormatException("Invalid value for hour (valid values 00 - 23)");
             }
             if (pattern.length() > 3 && Integer.parseInt(value.substring(3,5)) > 59) {
-                throw new EventConflictException("Invalid value for minutes (valid values 00 - 59)");
+                throw new NumberFormatException("Invalid value for minutes (valid values 00 - 59)");
             }
             if (pattern.length() > 6 && Integer.parseInt(value.substring(6,8)) > 59) {
-                throw new EventConflictException("Invalid value for seconds (valid values 00 - 59)");
+                throw new NumberFormatException("Invalid value for seconds (valid values 00 - 59)");
             }
             return LocalTime.parse(value, DateTimeFormatter.ofPattern(this.pattern));
-        } catch (EventConflictException ex) {
+        } catch (NumberFormatException ex) {
             throw JsonMappingException.from(p, ex.getMessage());
         } catch (Exception ex) {
             throw JsonMappingException.from(p, this.message);
