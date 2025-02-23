@@ -13,6 +13,8 @@ import br.com.nlw.events.repository.EventRepo;
 import br.com.nlw.events.repository.SubscriptionRepo;
 import br.com.nlw.events.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,12 @@ public class SubscriptionService {
 
     @Autowired
     private SubscriptionRepo subRepo;
+
+    private final ApplicationContext applicationContext;
+
+    public SubscriptionService(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     public SubscriptionOut createNewSubscription(String eventName, User user, Integer userId) {
         Event event = eventRepo.findByPrettyName(eventName);
@@ -63,17 +71,18 @@ public class SubscriptionService {
 
     }
 
+    @Cacheable(value = "ranking", key = "'rankingList'", cacheManager = "cacheManager")
     public List<SubscriptionRankingItem> getCompleteRanking(String prettyName) {
         Event event = eventRepo.findByPrettyName(prettyName);
         if (event == null) {
             throw new EventNotFoundException("Rankin do evento " + prettyName + " não existe.");
         }
         return subRepo.generateRanking(event.getEventId());
-
     }
 
     public SubscriptionRankingByUser getRankingByUser(String prettyName, Integer userId) {
-        List<SubscriptionRankingItem> ranking = getCompleteRanking(prettyName);
+        SubscriptionService self = applicationContext.getBean(SubscriptionService.class);
+        List<SubscriptionRankingItem> ranking = self.getCompleteRanking(prettyName);
         SubscriptionRankingItem item = ranking.stream()
                 .filter(i -> i.userId().equals(userId)).findFirst().orElse(null);
         if (item == null) {
