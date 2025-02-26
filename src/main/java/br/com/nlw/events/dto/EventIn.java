@@ -29,8 +29,8 @@ public record EventIn(
     @NotNull(message = "The field 'starDate' must not be null")
     LocalDate startDate,
 
-     @Future(message = "The field 'endDate' must not be in Past")
-     @Date(message = "The field 'endDate' must have format yyyy-MM-dd")
+     @Future(message = "The field 'endDate' must be in the Future")
+     @Date(message = "The field 'endDate' must have format yyyy-mm-dd")
      @NotNull(message = "The field 'endDate' must not be null")
      LocalDate endDate,
 
