@@ -40,7 +40,7 @@ public class EventService {
         return events;
     }
 
-    public Event getByPrettyName(String prettyName) {
-        return eventRepo.findByPrettyName(prettyName);
+    public EventOut getByPrettyName(String prettyName) {
+        return eventMapper.toEventOut(eventRepo.findByPrettyName(prettyName));
     }
 }
