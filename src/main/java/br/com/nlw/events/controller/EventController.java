@@ -17,7 +17,6 @@ import br.com.nlw.events.dto.ErrorMessage;
 import br.com.nlw.events.dto.EventIn;
 import br.com.nlw.events.dto.EventOut;
 import br.com.nlw.events.exception.EventConflictException;
-import br.com.nlw.events.model.Event;
 import br.com.nlw.events.service.EventService;
 import jakarta.validation.Valid;
 
@@ -47,9 +46,9 @@ public class EventController implements IEventController {
 
     @GetMapping("/{prettyName}")
     public ResponseEntity<?> getByPrettyName(@PathVariable(name = "prettyName") String id) {
-        Event event = service.getByPrettyName(id);
-        if (event != null) {
-            return ResponseEntity.ok().body(event);
+        EventOut eventOut = service.getByPrettyName(id);
+        if (eventOut != null) {
+            return ResponseEntity.ok().body(eventOut);
         }
         return ResponseEntity.notFound().build();
     }
