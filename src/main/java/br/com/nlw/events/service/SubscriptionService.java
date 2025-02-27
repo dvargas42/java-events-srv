@@ -26,21 +26,19 @@ import br.com.nlw.events.repository.UserRepo;
 @Service
 public class SubscriptionService {
 
-    @Autowired
-    private EventRepo eventRepo;
-
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    private SubscriptionRepo subRepo;
-
-    @Autowired
-    private ISubscriptionMapper subscriptionMapper;
-
+    private final EventRepo eventRepo;
+    private final UserRepo userRepo;
+    private final SubscriptionRepo subRepo;
+    private final ISubscriptionMapper subscriptionMapper;
     private final ApplicationContext applicationContext;
 
-    public SubscriptionService(ApplicationContext applicationContext) {
+    public SubscriptionService(EventRepo eventRepo, UserRepo userRepo, 
+            SubscriptionRepo subRepo, ISubscriptionMapper subscriptionMapper, 
+            ApplicationContext applicationContext) {
+        this.eventRepo = eventRepo;
+        this.userRepo = userRepo;
+        this.subRepo = subRepo;
+        this.subscriptionMapper = subscriptionMapper;
         this.applicationContext = applicationContext;
     }
 
