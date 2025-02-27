@@ -15,11 +15,13 @@ import br.com.nlw.events.repository.EventRepo;
 @Service
 public class EventService {
 
-    @Autowired
-    private EventRepo eventRepo;
+    private final EventRepo eventRepo;
+    private final IEventMapper eventMapper;
 
-    @Autowired
-    private IEventMapper eventMapper;
+    public EventService(EventRepo eventRepo, IEventMapper eventMapper) {
+        this.eventRepo = eventRepo;
+        this.eventMapper = eventMapper;
+    }
 
     public EventOut addNewEvent(EventIn eventIn) {
         String prettyName = eventIn.title().toLowerCase().replaceAll(" ", "-");
