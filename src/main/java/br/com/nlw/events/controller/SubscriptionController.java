@@ -25,8 +25,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/subscription")
 public class SubscriptionController implements ISubscriptionController {
 
-    @Autowired
-    private SubscriptionService service;
+    private final SubscriptionService service;
+    
+    public SubscriptionController(SubscriptionService service) {
+        this.service = service;
+    }
 
     @PostMapping({ "/{prettyName}", "/{prettyName}/{userId}" })
     public ResponseEntity<?> createSubscription(
