@@ -42,6 +42,8 @@ public class PriceValidator extends JsonDeserializer<Double> implements Contextu
                 throw new IllegalArgumentException("Price cannot be negative");
             }
             return price > 0 ? price : -price;
+        } catch (NumberFormatException ex) {
+            throw JsonMappingException.from(p, ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw JsonMappingException.from(p, this.message);
         }
