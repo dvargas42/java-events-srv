@@ -3,7 +3,6 @@ package br.com.nlw.events.controller;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +23,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/event")
 public class EventController implements IEventController {
 
-    @Autowired
-    private EventService service;
+    private final EventService service;
+
+    public EventController(EventService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public ResponseEntity<?> addNewEvent(@RequestBody @Valid EventIn eventIn, UriComponentsBuilder uriBuilder) {
