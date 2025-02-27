@@ -1,24 +1,27 @@
 package br.com.nlw.events.service;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
 import br.com.nlw.events.dto.SubscriptionOut;
 import br.com.nlw.events.dto.SubscriptionRankingByUser;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
+import br.com.nlw.events.dto.UserIn;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
+import br.com.nlw.events.mapper.ISubscriptionMapper;
 import br.com.nlw.events.model.Event;
 import br.com.nlw.events.model.Subscription;
 import br.com.nlw.events.model.User;
 import br.com.nlw.events.repository.EventRepo;
 import br.com.nlw.events.repository.SubscriptionRepo;
 import br.com.nlw.events.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 public class SubscriptionService {
@@ -32,20 +35,23 @@ public class SubscriptionService {
     @Autowired
     private SubscriptionRepo subRepo;
 
+    @Autowired
+    private ISubscriptionMapper subscriptionMapper;
+
     private final ApplicationContext applicationContext;
 
     public SubscriptionService(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    public SubscriptionOut createNewSubscription(String eventName, User user, Integer userId) {
+    public SubscriptionOut createSubscription(String eventName, Integer userId, UserIn userIn) {
         Event event = eventRepo.findByPrettyName(eventName);
         if (event == null) {
             throw new EventNotFoundException("Evento " + eventName + " nao existe.");
         }
-        User userRec = userRepo.findByEmail(user.getEmail());
+        User userRec = userRepo.findByEmail(userIn.email());
         if (userRec == null) {
-            userRec = userRepo.save(user);
+            userRec = userRepo.save(subscriptionMapper.toEntity(userIn));
         }
         User indicator = null;
         if (userId != null) {
@@ -75,7 +81,7 @@ public class SubscriptionService {
     public List<SubscriptionRankingItem> getCompleteRanking(String prettyName) {
         Event event = eventRepo.findByPrettyName(prettyName);
         if (event == null) {
-            throw new EventNotFoundException("Rankin do evento " + prettyName + " não existe.");
+            throw new EventNotFoundException("Ranking do evento " + prettyName + " não existe.");
         }
         return subRepo.generateRanking(event.getEventId());
     }
