@@ -239,7 +239,7 @@ class SubscriptionControllerCreateTest {
         assertEquals(404, subscriptionResponse.getStatusCode().value());
         try {
             assertThat(subscriptionResponse.getBody().message()).isEqualTo(expectedMessage);
-        } catch (Exception _e) {
+        } catch (Exception ex) {
             fail();
         }
     }
