@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import br.com.nlw.events.dto.SubscriptionOut;
 import br.com.nlw.events.dto.SubscriptionRankingByUser;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
-import br.com.nlw.events.model.User;
+import br.com.nlw.events.dto.UserIn;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,7 +24,7 @@ public interface ISubscriptionController {
         @ApiResponse(responseCode = "404", description = "Event not found or User indicator not found"),
         @ApiResponse(responseCode = "409", description = "Subscription conflict"),
     })
-    ResponseEntity<?> createSubscription(String prettyName, Integer userId, User subscriber);
+    ResponseEntity<?> createSubscription(String prettyName, Integer userId, UserIn subscriber);
 
     @Operation(summary = "Subscription ranking list all", description = "This functionality is responsible for list all subscription ranking from an event")
     @ApiResponses({
