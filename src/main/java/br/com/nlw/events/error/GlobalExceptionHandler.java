@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import br.com.nlw.events.exception.AISearchInvalidQueryException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handlerAllExceptions(Exception ex, WebRequest request) {
+    public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
         ApiErrorResponse errorResponse= new ApiErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage()
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handlerHttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request) {
+    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request) {
         ApiErrorResponse errorResponse= new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
@@ -40,7 +42,17 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(errorResponse);
     }
 
+    @ExceptionHandler(AISearchInvalidQueryException.class)
+    public ResponseEntity<Object> handleAIGenerateQueryInvalidException(AISearchInvalidQueryException ex, WebRequest request) {
+        ApiErrorResponse errorResponse= new ApiErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request
+        );
+        return buildResponseEntity(errorResponse);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiErrorResponse errorResponse) {
-        return new ResponseEntity<Object>(errorResponse, errorResponse.getHttpStatus());
+        return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
     }
 }
