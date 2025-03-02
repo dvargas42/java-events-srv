@@ -11,18 +11,22 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.WebRequest;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ApiErrorResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiErrorResponse.class);
-    
+
     private Integer statusCode;
+
     private HttpStatus httpStatus;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
     private String errorMessage;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ValidationError> validationErrors;
 
     private ApiErrorResponse() {
@@ -34,7 +38,9 @@ public class ApiErrorResponse {
         this.statusCode = httpStatus.value();
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
-        logger.error("API Error - Status: {}, Code: {}, Message: {}", this.httpStatus, this.statusCode, this.errorMessage);
+
+        logger.error("API Error - Status: {}, Code: {}, Message: {}",
+                this.httpStatus, this.statusCode, this.errorMessage);
     }
 
     public ApiErrorResponse(HttpStatus httpStatus, String errorMessage, WebRequest request) {
@@ -42,18 +48,26 @@ public class ApiErrorResponse {
         this.statusCode = httpStatus.value();
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
-        logger.error("API Error -Status: {}, Code: {}, Message: {}, Path: {}", this.httpStatus, this.statusCode, this.errorMessage, request.getDescription(false));
+
+        logger.error("API Error -Status: {}, Code: {}, Message: {}, Path: {}",
+                    this.httpStatus, this.statusCode, this.errorMessage,
+                    request.getDescription(true));
     }
 
-    public ApiErrorResponse(HttpStatus httpStatus, BindingResult bindingResult, List<FieldError> fieldErrors, WebRequest request) {
+    public ApiErrorResponse(HttpStatus httpStatus, BindingResult bindingResult,
+            List<FieldError> fieldErrors, WebRequest request) {
         this();
         this.statusCode = httpStatus.value();
         this.httpStatus = httpStatus;
-        this.errorMessage = "Validation failed for object='" + bindingResult.getObjectName() + "'. Error count: " + bindingResult.getErrorCount();
+        this.errorMessage = "Validation failed for object='" +
+                bindingResult.getObjectName() + "'. Error count: " + bindingResult.getErrorCount();
         this.validationErrors = fieldErrors.stream().map(ValidationError::new).toList();
-        logger.error("API Validation Error - Status: {}, Code: {}, Message: {}, Erros: {}, Path: {}", this.httpStatus, this.statusCode, this.errorMessage, this.validationErrors, request.getDescription(false));
+
+        logger.error("API Validation Error - Status: {}, Code: {}, Message: {}, Errors: {}, Path: {}",
+                    this.httpStatus, this.statusCode, this.errorMessage,
+                    this.validationErrors, request.getDescription(true));
     }
-    
+
     public record ValidationError(String field, String message) {
         public ValidationError(FieldError error) {
             this(error.getField(), error.getDefaultMessage());
