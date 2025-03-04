@@ -22,6 +22,4 @@ public record EventOut (
     LocalTime startTime,
 
     LocalTime endTime
-){
-    
-}
+){}
