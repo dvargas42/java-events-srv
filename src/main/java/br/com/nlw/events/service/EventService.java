@@ -2,7 +2,6 @@ package br.com.nlw.events.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.nlw.events.dto.EventIn;
@@ -24,7 +23,7 @@ public class EventService {
     }
 
     public EventOut addNewEvent(EventIn eventIn) {
-        String prettyName = eventIn.title().toLowerCase().replaceAll(" ", "-");
+        String prettyName = eventIn.title().toLowerCase().replace(" ", "-");
         Event foundEvent = eventRepo.findByPrettyName(prettyName);
         if (foundEvent != null) {
             throw new EventConflictException("Já existe cadastro para o evento " + foundEvent.getTitle());
@@ -35,11 +34,8 @@ public class EventService {
     }
 
     public List<EventOut> getAllEvents() {
-        List<EventOut> events = ((List<Event>) eventRepo.findAll()).stream()
-                .map(event -> {
-                    return eventMapper.toEventOut(event);
-                }).toList();
-        return events;
+        return ((List<Event>) eventRepo.findAll()).stream()
+                .map(eventMapper::toEventOut).toList();
     }
 
     public EventOut getByPrettyName(String prettyName) {
