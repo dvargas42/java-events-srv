@@ -3,7 +3,6 @@ package br.com.nlw.events.service;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,7 @@ import br.com.nlw.events.dto.SubscriptionOut;
 import br.com.nlw.events.dto.SubscriptionRankingByUser;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
 import br.com.nlw.events.dto.UserIn;
+import br.com.nlw.events.email.EmailSubscrionCompleted;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
@@ -29,15 +29,17 @@ public class SubscriptionService {
     private final EventRepo eventRepo;
     private final UserRepo userRepo;
     private final SubscriptionRepo subRepo;
+    private final EmailSubscrionCompleted emailSubscrionCompleted;
     private final ISubscriptionMapper subscriptionMapper;
     private final ApplicationContext applicationContext;
 
     public SubscriptionService(EventRepo eventRepo, UserRepo userRepo, 
-            SubscriptionRepo subRepo, ISubscriptionMapper subscriptionMapper, 
-            ApplicationContext applicationContext) {
+            SubscriptionRepo subRepo, EmailSubscrionCompleted emailSubscrionCompleted, 
+            ISubscriptionMapper subscriptionMapper, ApplicationContext applicationContext) {
         this.eventRepo = eventRepo;
         this.userRepo = userRepo;
         this.subRepo = subRepo;
+        this.emailSubscrionCompleted = emailSubscrionCompleted;
         this.subscriptionMapper = subscriptionMapper;
         this.applicationContext = applicationContext;
     }
@@ -68,8 +70,12 @@ public class SubscriptionService {
         if (sub != null) {
             throw new SubscriptionConflictException("Ja existe inscricao para o usuario " + userRec.getEmail() + " no evento " + event.getTitle());
         }
-        subRepo.save(subs);
 
+        subRepo.save(subs);
+        emailSubscrionCompleted.execute(userRec.getEmail(), 
+                "Inscricão para o evento " + event.getTitle(), 
+                userRec.getName() + ", sua inscrição foi confirmada com sucesso.");
+        
         return new SubscriptionOut(subs.getSubscriptionNumber(), "http://codecraft.com/subscription/"
                 + subs.getEvent().getPrettyName() + "/" + subs.getSubscriber().getId());
 
