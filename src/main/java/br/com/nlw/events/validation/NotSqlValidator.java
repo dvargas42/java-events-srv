@@ -9,7 +9,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class NotSqlValidator implements ConstraintValidator<NotSql, String>{
 
     private Pattern pattern = Pattern.compile(
-            "(--|\\bOR\\b|\\bAND\\b|SELECT|INSERT|DELETE|UPDATE|DROP|\\bFROM\\b|\\bWHERE\\b)",
+            "(--|\\b(OR|AND)\\b.+\\b(SELECT|INSERT|DELETE|UPDATE|DROP|FROM|WHERE)\\b|\\b(SELECT|INSERT|DELETE|UPDATE|DROP)\\b.+\\b(FROM|WHERE)\\b)",
             Pattern.CASE_INSENSITIVE);
 
 
