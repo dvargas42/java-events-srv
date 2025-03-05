@@ -3,27 +3,46 @@ name: Events Application
 on:
     push:
         branches: [master]
+    pull_request:
+        branches: [master]
 
 jobs:
-    build:
+    test:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
+
             - name: Setup Java
               uses: actions/setup-java@v4
               with:
                 distribution: temurin
                 java-version: 21
+
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Java
+              uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: 21
+
             - name: Build project
               run: mvn clean install -DskipTests
               env:
                 SPRING_DATASOURCE_URL: ${{ secrets.SPRING_FLYWAY_ENABLE }}
                 SPRING_PROFILES_ACTIVE: production
+
             - name: Login Docker
               run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            
             - name: Build Docker image
-              run: docker build -t dvargas42/java-events-srv .
+              run: docker build -t dvargas42/events-srv .
+
             - name: Publish image
-              run: docker push dvargas42/java-events-srv
+              run: docker push dvargas42/events-srv
               
