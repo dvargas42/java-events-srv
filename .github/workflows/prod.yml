@@ -13,5 +13,7 @@ jobs:
             - name: Setup Java
               uses: actions/setup-java@v4
               with:
-                distibution: temurin
+                distribution: temurin
                 java-version: 21
+            - name: Build project
+              run: mvn clean install
