@@ -2,7 +2,7 @@ name: Events Application
 
 on:
     push:
-        branches: [main]
+        branches: [master]
 
 jobs:
     build:
