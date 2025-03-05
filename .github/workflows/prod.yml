@@ -1,0 +1,17 @@
+name: Events Application
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Setup Java
+              uses: actions/setup-java@v3
+              with:
+                distibution: temurin
+                java-version: 21
