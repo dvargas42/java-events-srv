@@ -17,3 +17,10 @@ jobs:
                 java-version: 21
             - name: Build project
               run: mvn clean install
+            - name: Login Docker
+              run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+            - name: Build Docker image
+              run: docker build -t dvargas42/java-events-srv .
+            - name: Publish image
+              run: docker push dvargas42/java-events-srv
+              
