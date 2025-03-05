@@ -18,6 +18,10 @@ jobs:
               with:
                 distribution: temurin
                 java-version: 21
+            - name: Run teste
+              run: mvn test
+              env:
+                SPRING_PROFILES_ACTIVE: test
 
     build:
         runs-on: ubuntu-latest
