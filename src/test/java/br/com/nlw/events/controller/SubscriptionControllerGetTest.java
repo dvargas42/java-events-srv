@@ -57,16 +57,23 @@ class SubscriptionControllerGetTest {
 
         eventResponse = restTemplate.postForEntity("/event", eventIn, EventOut.class);
         if (eventResponse.getBody() == null) {
-            fail();
+            fail("Event creation failed");
         }
         prettyName = eventResponse.getBody().prettyName();
-        int max = 0;
+        
+        createIndicatorUsers();
+        createSubscriptionUsers();
+    }
 
+    private void createIndicatorUsers() {
         for (int i = 1; i <= 4; i++) {
             UserIn indicatorUser = new UserIn("Integration Test" + i, "integration.test" + i + "@test.com");
             restTemplate.postForEntity("/subscription/" + prettyName, indicatorUser, SubscriptionOut.class);
         }
+    }
 
+    private void createSubscriptionUsers() {
+        int max = 0;
         for (int i = 1; i <= 4; i++) {
             for (int j = (10 * i); j < (10 * (i + 1) - max); j++) {
                 UserIn user = new UserIn("Integration Test" + j, "integration.test" + j + "@test.com");
@@ -83,7 +90,7 @@ class SubscriptionControllerGetTest {
                 SubscriptionRankingItem[].class, 
                 title.toLowerCase().replace(" ", "-"));
         if (response.getBody() == null) {
-            fail();
+            fail("Response body is null");
         }
         assertEquals(200, response.getStatusCode().value());
         assertEquals(3, response.getBody().length);
@@ -97,7 +104,7 @@ class SubscriptionControllerGetTest {
                 ErrorMessage.class, 
                 invalidPrettyName);
         if (response.getBody() == null) {
-            fail();
+            fail("Response body is null");
         }
         String expectedMessage = "Ranking do evento " + invalidPrettyName + " não existe.";
         assertEquals(404, response.getStatusCode().value());
@@ -112,7 +119,7 @@ class SubscriptionControllerGetTest {
                 title.toLowerCase().replace(" ", "-"),
                 1);
         if (response.getBody() == null) {
-            fail();
+            fail("Response body is null");
         }
         SubscriptionRankingByUser rankingByUser = new SubscriptionRankingByUser(
                 new SubscriptionRankingItem(1, "Integration Test1", 10L), 
@@ -127,7 +134,7 @@ class SubscriptionControllerGetTest {
         UserIn indicatorUser = new UserIn("Integration Test", "integration.test@test.com");
         var createUserRes = restTemplate.postForEntity("/subscription/" + prettyName, indicatorUser, SubscriptionOut.class);
         if (createUserRes.getBody() == null) {
-            fail();
+            fail("User creation failed");
         }
         int userId = createUserRes.getBody().subscriptionNumber();
         ResponseEntity<ErrorMessage> response = restTemplate.getForEntity(
@@ -135,7 +142,7 @@ class SubscriptionControllerGetTest {
             ErrorMessage.class, 
             prettyName, String.valueOf(userId));
         if (response.getBody() == null) {
-            fail();
+            fail("Response body is null");
         }
         String expectedMessage = "Não há inscrições com indicação para o usuario " + userId;
         
