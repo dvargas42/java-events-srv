@@ -88,6 +88,9 @@ jobs:
         runs-on: self-hosted         
         needs: build
         steps:
+            - name: Create Docker network
+              run: docker network inspect events-network >/dev/null 2>&1 || docker network create events-network
+        
             - name: Remove old Redis container
               run: docker rm -f events-redis || true
 
@@ -118,8 +121,8 @@ jobs:
                 -e OPENAI_API_KEY='${{secrets.OPENAI_API_KEY}}' \
                 -e SPRING_MAIL_PASSWORD='${{secrets.SPRING_MAIL_PASSWORD}}' \
                 -e SPRING_MAIL_USERNAME='${{secrets.SPRING_MAIL_USERNAME}}' \
-                -e SPRING_REDIS_HOST=${{secrets.SPRING_REDIS_HOST}} \
+                -e SPRING_REDIS_HOST=events-redis \
                 -e SPRING_REDIS_USER=${{secrets.SPRING_REDIS_USER}} \
                 -e SPRING_REDIS_PASSWORD=${{secrets.SPRING_REDIS_PASSWORD}} \
-                -e SPRING_REDIS_PORT=${{secrets.SPRING_REDIS_PORT}} \
-                dvargas42/events-srv
+                -e SPRING_REDIS_PORT=6379 \
+                dvargas42/events-srv:latest
