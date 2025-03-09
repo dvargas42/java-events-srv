@@ -91,9 +91,6 @@ jobs:
             - name: Remove old Redis container
               run: docker rm -f events-redis || true
 
-            - name: Ensure Redis data directory exists
-              run: mkdir -p /home/ubuntu/redis_data
-
             - name: Run Redis container
               run: docker run -d \
                 --name events-redis \
