@@ -19,9 +19,12 @@ jobs:
                 distribution: temurin
                 java-version: 21
             - name: Run unit test
-              run: mvn test
+              run: SPRING_PROFILES_ACTIVE=test mvn test
               env:
                 SPRING_PROFILES_ACTIVE: test
+            - name: Show test logs if failed
+              if: failure()
+              run: cat target/surefire-reports/*.txt
 
     integration-test:
         runs-on: ubuntu-latest
@@ -35,10 +38,13 @@ jobs:
                 distribution: temurin
                 java-version: 21
             - name: Run integration test
-              run: mvn verify
+              run: SPRING_PROFILES_ACTIVE=test mvn verify
               env:
                 SPRING_PROFILES_ACTIVE: test
-            
+            - name: Show test logs if failed
+              if: failure()
+              run: cat target/surefire-reports/*.txt
+        
     build:
         runs-on: ubuntu-latest
         steps:
