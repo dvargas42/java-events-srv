@@ -41,7 +41,7 @@ class AISearchControllerTest {
 
   @Autowired private TestRestTemplate restTemplate;
   @Mock private OpenAiService openAiService;
-  @InjectMocks AISearchService aiService;
+  @InjectMocks private AISearchService aiService;
 
   private HttpHeaders headers;
 
@@ -105,22 +105,14 @@ class AISearchControllerTest {
     assertThat(response.getBody().result()).isNotNull();
   }
 
-  private ChatCompletionResult mockChatCompletionResult(String responseText) {
-    ChatMessage message = new ChatMessage(ChatMessageRole.ASSISTANT.value(), responseText);
-
-    ChatCompletionChoice choice = new ChatCompletionChoice();
-    choice.setMessage(message);
-
-    ChatCompletionResult result = new ChatCompletionResult();
-    result.setChoices(Collections.singletonList(choice));
-
-    return result;
-  }
-
   @Test
   void shouldGenerateMarkDownAndReturnFullList() {
     HttpEntity<EventIn> eventRequest = new HttpEntity<>(EVENT_IN, headers);
     restTemplate.exchange("/event", HttpMethod.POST, eventRequest, String.class);
+
+    String mockQuery = "| EVENT_ID |";
+    when(openAiService.createChatCompletion(any(ChatCompletionRequest.class)))
+        .thenReturn(mockChatCompletionResult(mockQuery));
 
     AISearchIn aiSearchIn =
         new AISearchIn("Return all events available and include event_id in objects.", true);
@@ -138,6 +130,10 @@ class AISearchControllerTest {
 
   @Test
   void shouldGenerateMarkDownAndReturnEmptyList() {
+    String mockQuery = "|";
+    when(openAiService.createChatCompletion(any(ChatCompletionRequest.class)))
+        .thenReturn(mockChatCompletionResult(mockQuery));
+
     AISearchIn aiSearchIn =
         new AISearchIn("Return all events available for registration in March", true);
     HttpEntity<AISearchIn> request = new HttpEntity<>(aiSearchIn, headers);
@@ -150,5 +146,17 @@ class AISearchControllerTest {
 
     assertThat(response.getStatusCode().value()).isEqualTo(200);
     assertThat(response.getBody().result()).contains("|");
+  }
+
+  private ChatCompletionResult mockChatCompletionResult(String responseText) {
+    ChatMessage message = new ChatMessage(ChatMessageRole.ASSISTANT.value(), responseText);
+
+    ChatCompletionChoice choice = new ChatCompletionChoice();
+    choice.setMessage(message);
+
+    ChatCompletionResult result = new ChatCompletionResult();
+    result.setChoices(Collections.singletonList(choice));
+
+    return result;
   }
 }
