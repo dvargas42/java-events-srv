@@ -95,4 +95,4 @@ jobs:
               run: docker rm -f events-app
 
             - name: Run Docker container
-              run: docker run -d -p 8080:8080 -e SPRING_DB_URL=${{secrets.SPRING_DB_URL}} -e SPRING_DB_USERNAME=${{secrets.SPRING_DB_USERNAME}} -e SPRING_DB_PASSWORD=${{secrets.SPRING_DB_PASSWORD}} -e OPENAI_API_KEY='${{secrets.OPENAI_API_KEY}}' -e SPRING_MAIL_PASSWORD='${{secrets.SPRING_MAIL_PASSWORD}}' -e SPRING_MAIL_USERNAME='${{secrets.SPRING_MAIL_USERNAME}}' --name events-app dvargas42/events-srv
+              run: docker run -d -p 8080:8080 -e SPRING_DB_URL=${{secrets.SPRING_DB_URL}} -e SPRING_DB_USERNAME=${{secrets.SPRING_DB_USERNAME}} -e SPRING_DB_PASSWORD=${{secrets.SPRING_DB_PASSWORD}} -e OPENAI_API_KEY='${{secrets.OPENAI_API_KEY}}' -e SPRING_MAIL_PASSWORD='${{secrets.SPRING_MAIL_PASSWORD}}' -e SPRING_MAIL_USERNAME='${{secrets.SPRING_MAIL_USERNAME}}' -e SPRING_REDIS_HOST=${{secrets.SPRING_REDIS_HOST}} -e SPRING_REDIS_USER=${{secrets.SPRING_REDIS_USER}} -e SPRING_REDIS_PASSWORD=${{secrets.SPRING_REDIS_PASSWORD}} -e SPRING_REDIS_PORT=${{secrets.SPRING_REDIS_PORT}} --name events-app dvargas42/events-srv
