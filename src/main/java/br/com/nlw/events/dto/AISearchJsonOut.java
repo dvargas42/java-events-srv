@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public record AISearchJsonOut(
-    List <Map<String, Object>> result,
+    List<Map<String, Object>> result,
     Integer imputCountTokens,
     Integer outputCountTokens,
-    BigDecimal costEstimate
-) { }
+    BigDecimal costEstimate) {}

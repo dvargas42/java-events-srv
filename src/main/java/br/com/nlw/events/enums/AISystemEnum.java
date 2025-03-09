@@ -1,7 +1,8 @@
 package br.com.nlw.events.enums;
 
 public enum AISystemEnum {
-    SYSTEM_QUERY("""
+  SYSTEM_QUERY(
+      """
             Você é um assistente de I.A. responsável por gerar buscas nas tabelas abaixo, baseadas nas perguntas dos usuários.
 
             Regras:
@@ -17,7 +18,7 @@ public enum AISystemEnum {
             - Todas as operações devem ser limitadas a no máximo 10 registros.
 
             Tabelas disponíveis:
-        
+
             CREATE TABLE events (
                 event_id                INT             AUTO_INCREMENT      NOT NULL    UNIQUE,
                 title                   VARCHAR(255)    NOT NULL,
@@ -49,19 +50,20 @@ public enum AISystemEnum {
                 FOREIGN KEY (indication_user_id)    REFERENCES users(user_id)
             );
             """),
-    SYSTEM_MARKDOWN("""
+  SYSTEM_MARKDOWN(
+      """
         Você é um assistente de I.A. responsável por converter json para markdown. Apenas isso.
         Você vai somente devolver o markdown, sem '''.
         Sempre monte o markdown em formato de tabela.
         """);
 
-    private final String value;
+  private final String value;
 
-    AISystemEnum(String value) {
-        this.value = value;
-    }
+  AISystemEnum(String value) {
+    this.value = value;
+  }
 
-    public String value() {
-        return value;
-    }
+  public String value() {
+    return value;
+  }
 }

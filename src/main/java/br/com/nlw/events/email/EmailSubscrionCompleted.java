@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailSubscrionCompleted {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmailSubscrionCompleted.class);
-    
-    private final EmailService emailService;
+  private static final Logger logger = LoggerFactory.getLogger(EmailSubscrionCompleted.class);
 
-    public EmailSubscrionCompleted(EmailService emailservice) {
-        this.emailService = emailservice;
-    }
+  private final EmailService emailService;
 
-    @Async("asyncExecutor")
-    public void execute(String to, String subject, String content){
-        emailService.sendEmail(to, subject, content);
-        logger.info("Email thread " + Thread.currentThread().getName());
-    }
+  public EmailSubscrionCompleted(EmailService emailservice) {
+    this.emailService = emailservice;
+  }
+
+  @Async("asyncExecutor")
+  public void execute(String to, String subject, String content) {
+    emailService.sendEmail(to, subject, content);
+    logger.info("Email thread " + Thread.currentThread().getName());
+  }
 }

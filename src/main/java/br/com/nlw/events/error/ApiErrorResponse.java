@@ -1,8 +1,9 @@
 package br.com.nlw.events.error;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,107 +11,120 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.WebRequest;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 public class ApiErrorResponse {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiErrorResponse.class);
+  private static final Logger logger = LoggerFactory.getLogger(ApiErrorResponse.class);
 
-    private Integer statusCode;
+  private Integer statusCode;
 
-    private HttpStatus httpStatus;
+  private HttpStatus httpStatus;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timestamp;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime timestamp;
 
-    private String errorMessage;
+  private String errorMessage;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<ValidationError> validationErrors;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<ValidationError> validationErrors;
 
-    private ApiErrorResponse() {
-        this.timestamp = LocalDateTime.now();
+  private ApiErrorResponse() {
+    this.timestamp = LocalDateTime.now();
+  }
+
+  public ApiErrorResponse(HttpStatus httpStatus, String errorMessage) {
+    this();
+    this.statusCode = httpStatus.value();
+    this.httpStatus = httpStatus;
+    this.errorMessage = errorMessage;
+
+    logger.error(
+        "API Error - Status: {}, Code: {}, Message: {}",
+        this.httpStatus,
+        this.statusCode,
+        this.errorMessage);
+  }
+
+  public ApiErrorResponse(HttpStatus httpStatus, String errorMessage, WebRequest request) {
+    this();
+    this.statusCode = httpStatus.value();
+    this.httpStatus = httpStatus;
+    this.errorMessage = errorMessage;
+
+    logger.error(
+        "API Error -Status: {}, Code: {}, Message: {}, Path: {}",
+        this.httpStatus,
+        this.statusCode,
+        this.errorMessage,
+        request.getDescription(true));
+  }
+
+  public ApiErrorResponse(
+      HttpStatus httpStatus,
+      BindingResult bindingResult,
+      List<FieldError> fieldErrors,
+      WebRequest request) {
+    this();
+    this.statusCode = httpStatus.value();
+    this.httpStatus = httpStatus;
+    this.errorMessage =
+        "Validation failed for object='"
+            + bindingResult.getObjectName()
+            + "'. Error count: "
+            + bindingResult.getErrorCount();
+    this.validationErrors = fieldErrors.stream().map(ValidationError::new).toList();
+
+    logger.error(
+        "API Validation Error - Status: {}, Code: {}, Message: {}, Errors: {}, Path: {}",
+        this.httpStatus,
+        this.statusCode,
+        this.errorMessage,
+        this.validationErrors,
+        request.getDescription(true));
+  }
+
+  public record ValidationError(String field, String message) {
+    public ValidationError(FieldError error) {
+      this(error.getField(), error.getDefaultMessage());
     }
+  }
 
-    public ApiErrorResponse(HttpStatus httpStatus, String errorMessage) {
-        this();
-        this.statusCode = httpStatus.value();
-        this.httpStatus = httpStatus;
-        this.errorMessage = errorMessage;
+  public Integer getStatusCode() {
+    return statusCode;
+  }
 
-        logger.error("API Error - Status: {}, Code: {}, Message: {}",
-                this.httpStatus, this.statusCode, this.errorMessage);
-    }
+  public void setStatusCode(Integer statusCode) {
+    this.statusCode = statusCode;
+  }
 
-    public ApiErrorResponse(HttpStatus httpStatus, String errorMessage, WebRequest request) {
-        this();
-        this.statusCode = httpStatus.value();
-        this.httpStatus = httpStatus;
-        this.errorMessage = errorMessage;
+  public HttpStatus getHttpStatus() {
+    return httpStatus;
+  }
 
-        logger.error("API Error -Status: {}, Code: {}, Message: {}, Path: {}",
-                    this.httpStatus, this.statusCode, this.errorMessage,
-                    request.getDescription(true));
-    }
+  public void setHttpStatus(HttpStatus httpStatus) {
+    this.httpStatus = httpStatus;
+  }
 
-    public ApiErrorResponse(HttpStatus httpStatus, BindingResult bindingResult,
-            List<FieldError> fieldErrors, WebRequest request) {
-        this();
-        this.statusCode = httpStatus.value();
-        this.httpStatus = httpStatus;
-        this.errorMessage = "Validation failed for object='" +
-                bindingResult.getObjectName() + "'. Error count: " + bindingResult.getErrorCount();
-        this.validationErrors = fieldErrors.stream().map(ValidationError::new).toList();
+  public LocalDateTime getTimestamp() {
+    return timestamp;
+  }
 
-        logger.error("API Validation Error - Status: {}, Code: {}, Message: {}, Errors: {}, Path: {}",
-                    this.httpStatus, this.statusCode, this.errorMessage,
-                    this.validationErrors, request.getDescription(true));
-    }
+  public void setTimestamp(LocalDateTime timestamp) {
+    this.timestamp = timestamp;
+  }
 
-    public record ValidationError(String field, String message) {
-        public ValidationError(FieldError error) {
-            this(error.getField(), error.getDefaultMessage());
-        }
-    }
+  public String getErrorMessage() {
+    return errorMessage;
+  }
 
-    public Integer getStatusCode() {
-        return statusCode;
-    }
+  public void setErrorMessage(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
-    }
+  public List<ValidationError> getValidationErrors() {
+    return validationErrors;
+  }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public List<ValidationError> getValidationErrors() {
-        return validationErrors;
-    }
-
-    public void setValidationErrors(List<ValidationError> validationErrors) {
-        this.validationErrors = validationErrors;
-    }
+  public void setValidationErrors(List<ValidationError> validationErrors) {
+    this.validationErrors = validationErrors;
+  }
 }

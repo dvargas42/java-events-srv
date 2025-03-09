@@ -9,22 +9,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender emailSender;
+  @Autowired private JavaMailSender emailSender;
 
-    @Value("${spring.mail.username}")
-    private String from;
+  @Value("${spring.mail.username}")
+  private String from;
 
-    public void sendEmail(String to, String subject, String content) {
-        try {
-            SimpleMailMessage email = new SimpleMailMessage();
-            email.setFrom(from);
-            email.setSubject(subject);
-            email.setTo(to);
-            email.setText(content);
-            emailSender.send(email);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error sending email", ex);
-        }
+  public void sendEmail(String to, String subject, String content) {
+    try {
+      SimpleMailMessage email = new SimpleMailMessage();
+      email.setFrom(from);
+      email.setSubject(subject);
+      email.setTo(to);
+      email.setText(content);
+      emailSender.send(email);
+    } catch (Exception ex) {
+      throw new RuntimeException("Error sending email", ex);
     }
+  }
 }

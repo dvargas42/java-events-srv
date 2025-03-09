@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class EventsApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EventsApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(EventsApplication.class, args);
+  }
 }
