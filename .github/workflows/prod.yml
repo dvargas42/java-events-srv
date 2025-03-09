@@ -84,4 +84,15 @@ jobs:
 
             - name: Publish image
               run: docker push dvargas42/events-srv
-              
+    deploy:
+        runs-on: self-hosted         
+        needs: build
+        steps:
+            - name: Pull image DockerHub
+              run: docker pull dvargas42/events-srv:latest
+            
+            - name: Remove old container
+              run: docker rm -f events-app
+
+            - name: Run Docker container
+              run: docker run -d -p 8080:8080 -e SPRING_DB_URL=${{secrets.SPRING_DB_URL}} -e SPRING_DB_USERNAME=${{secrets.SPRING_DB_USERNAME}} -e SPRING_DB_PASSWORD=${{secrets.SPRING_DB_PASSWORD}} --name events-app dvargas42/events-srv
