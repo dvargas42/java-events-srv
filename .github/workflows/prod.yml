@@ -18,10 +18,12 @@ jobs:
               with:
                 distribution: temurin
                 java-version: 21
+                
             - name: Run unit test
               run: SPRING_PROFILES_ACTIVE=test mvn test
               env:
                 SPRING_PROFILES_ACTIVE: test
+
             - name: Upload test logs if failed
               if: failure()
               uses: actions/upload-artifact@v4
@@ -40,16 +42,18 @@ jobs:
               with:
                 distribution: temurin
                 java-version: 21
+
             - name: Run integration test
               run: SPRING_PROFILES_ACTIVE=test mvn verify
               env:
                 SPRING_PROFILES_ACTIVE: test
+
             - name: Upload test logs if failed
               if: failure()
               uses: actions/upload-artifact@v4
               with:
-                name: surefire-reports-unit
-                path: target/surefire-reports/*.txt
+                name: failsafe-reports-unit
+                path: target/failsafe-reports/*.txt
         
     build:
         runs-on: ubuntu-latest
