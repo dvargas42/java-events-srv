@@ -7,7 +7,7 @@ on:
         branches: [master]
 
 jobs:
-    test:
+    unit-test:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -18,8 +18,24 @@ jobs:
               with:
                 distribution: temurin
                 java-version: 21
-            - name: Run teste
+            - name: Run unit test
               run: mvn test
+              env:
+                SPRING_PROFILES_ACTIVE: test
+
+    integration-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Java
+              uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: 21
+            - name: Run integration test
+              run: mvn verify
               env:
                 SPRING_PROFILES_ACTIVE: test
             
