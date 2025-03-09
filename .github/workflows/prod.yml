@@ -90,19 +90,6 @@ jobs:
         steps:
             - name: Create Docker network
               run: docker network inspect events-network >/dev/null 2>&1 || docker network create events-network
-        
-            - name: Remove old Redis container
-              run: docker rm -f events-redis || true
-
-            - name: Run Redis container
-              run: docker run -d \
-                --name events-redis \
-                --network events-network \
-                -p 6379:6379 \
-                -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
-                -v /home/ubuntu/redis_data:/data \
-                redis:latest \
-                redis-server /usr/local/etc/redis/redis.conf
                 
             - name: Pull image DockerHub
               run: docker pull dvargas42/events-srv:latest
