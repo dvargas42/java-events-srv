@@ -5,18 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import br.com.nlw.events.dto.ErrorMessage;
-import br.com.nlw.events.dto.EventIn;
-import br.com.nlw.events.dto.EventOut;
-import br.com.nlw.events.dto.SubscriptionOut;
-import br.com.nlw.events.dto.UserIn;
-import br.com.nlw.events.error.ApiErrorResponse;
-import br.com.nlw.events.service.EventService;
-import br.com.nlw.events.service.SubscriptionService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,6 +21,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+
+import br.com.nlw.events.dto.EventIn;
+import br.com.nlw.events.dto.EventOut;
+import br.com.nlw.events.dto.SubscriptionOut;
+import br.com.nlw.events.dto.UserIn;
+import br.com.nlw.events.error.ApiErrorResponse;
+import br.com.nlw.events.service.EventService;
+import br.com.nlw.events.service.SubscriptionService;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -216,58 +217,59 @@ class SubscriptionControllerCreateIT {
   }
 
   @Test
-  void shouldToBeNotAbleToCreateSubscriptionWhenEventNotExists() {
+  void shouldNotCreateSubscriptionWhenEventNotExists() {
     UserIn userIn = new UserIn("Integration Test", "integration.test@test.com");
     String invalidPrettyName = prettyName + "-invalid";
-    ResponseEntity<ErrorMessage> subscriptionResponse =
+    ResponseEntity<ApiErrorResponse> subscriptionResponse =
         restTemplate.postForEntity(
-            "/subscription/" + invalidPrettyName, userIn, ErrorMessage.class);
+            "/subscription/" + invalidPrettyName, userIn, ApiErrorResponse.class);
 
-    if (subscriptionResponse.getBody().equals(null)) {
+    if (subscriptionResponse.getBody() == null) {
       fail("User subscription with event not found failed");
     }
 
-    String expectedMessage = "Evento " + invalidPrettyName + " nao existe.";
+    String expectedMessage = "Event " + invalidPrettyName + " not found.";
 
     assertEquals(404, subscriptionResponse.getStatusCode().value());
-    assertThat(subscriptionResponse.getBody().message()).isEqualTo(expectedMessage);
+    assertThat(subscriptionResponse.getBody().getErrorMessage()).isEqualTo(expectedMessage);
   }
 
   @Test
-  void shouldToBeNotAbleToCreateSubscriptionWhenIndicatorUserNotExists() {
+  void shouldNotCreateSubscriptionWhenIndicatorUserNotExists() {
     UserIn userIn = new UserIn("Integration Test", "integration.test@test.com");
     int userId = 2_000;
-    ResponseEntity<ErrorMessage> subscriptionResponse =
+    ResponseEntity<ApiErrorResponse> subscriptionResponse =
         restTemplate.postForEntity(
-            "/subscription/" + prettyName + "/" + userId, userIn, ErrorMessage.class);
+            "/subscription/" + prettyName + "/" + userId, userIn, ApiErrorResponse.class);
 
-    if (subscriptionResponse.getBody().equals(null)) {
+    if (subscriptionResponse.getBody() == null) {
       fail("User subscription with user indicator failed");
     }
 
-    String expectedMessage = "Usuario " + userId + " indicador nao existe.";
+    String expectedMessage = "User indicator " + userId + " not found.";
 
     assertEquals(404, subscriptionResponse.getStatusCode().value());
-    assertThat(subscriptionResponse.getBody().message()).isEqualTo(expectedMessage);
+    assertThat(subscriptionResponse.getBody().getErrorMessage()).isEqualTo(expectedMessage);
   }
 
   @Test
   void shouldCreateSubscriptionWhenUserAlreadyExists() {
     String email = "integration.test@test.com";
     UserIn userIn = new UserIn("Integration Test", email);
-    ResponseEntity<ErrorMessage> subscriptionResponse = null;
+
+    ResponseEntity<ApiErrorResponse> subscriptionResponse = null;
     for (int i = 0; i < 2; i++) {
       subscriptionResponse =
-          restTemplate.postForEntity("/subscription/" + prettyName, userIn, ErrorMessage.class);
+          restTemplate.postForEntity("/subscription/" + prettyName, userIn, ApiErrorResponse.class);
     }
 
-    if (subscriptionResponse.getBody().equals(null)) {
+    if (subscriptionResponse.getBody() == null) {
       fail("User subscription with user indicator failed");
     }
 
-    String expectedMessage = "Ja existe inscricao para o usuario " + email + " no evento " + title;
+    String expectedMessage = "There is already a registration for the user " + email + " in event " + title;
 
     assertEquals(409, subscriptionResponse.getStatusCode().value());
-    assertThat(subscriptionResponse.getBody().message()).isEqualTo(expectedMessage);
+    assertThat(subscriptionResponse.getBody().getErrorMessage()).isEqualTo(expectedMessage);
   }
 }
