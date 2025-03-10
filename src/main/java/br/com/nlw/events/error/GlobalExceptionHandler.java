@@ -11,6 +11,9 @@ import org.springframework.web.context.request.WebRequest;
 import br.com.nlw.events.exception.AISearchInvalidQueryException;
 import br.com.nlw.events.exception.EventConflictException;
 import br.com.nlw.events.exception.EventNotFoundException;
+import br.com.nlw.events.exception.SubscriptionConflictException;
+import br.com.nlw.events.exception.SubscriptionEventNotFoundException;
+import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -35,6 +38,31 @@ public class GlobalExceptionHandler {
       EventNotFoundException ex, WebRequest request) {
     new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     return ResponseEntity.notFound().build();
+  }
+
+  @ExceptionHandler(SubscriptionEventNotFoundException.class)
+  public ResponseEntity<Object> handleSubscriptionEventNotFoundException(
+      SubscriptionEventNotFoundException ex, WebRequest request) {
+    ApiErrorResponse errorResponse = 
+        new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
+  }
+
+  
+  @ExceptionHandler(UserIndicatorNotFoundException.class)
+  public ResponseEntity<Object> handleUserIndicatorNotFoundException(
+      UserIndicatorNotFoundException ex, WebRequest request) {
+    ApiErrorResponse errorResponse = 
+        new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
+  }
+
+  @ExceptionHandler(SubscriptionConflictException.class)
+  public ResponseEntity<Object> handleSubscriptionConflictException(
+      SubscriptionConflictException ex, WebRequest request) {
+    ApiErrorResponse errorResponse =
+        new ApiErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
