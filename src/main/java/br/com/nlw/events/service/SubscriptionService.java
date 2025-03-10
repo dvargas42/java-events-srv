@@ -7,6 +7,7 @@ import br.com.nlw.events.dto.UserIn;
 import br.com.nlw.events.email.EmailSubscrionCompleted;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
+import br.com.nlw.events.exception.SubscriptionEventNotFoundException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 import br.com.nlw.events.mapper.ISubscriptionMapper;
 import br.com.nlw.events.model.Event;
@@ -46,10 +47,10 @@ public class SubscriptionService {
     this.applicationContext = applicationContext;
   }
 
-  public SubscriptionOut createSubscription(String eventName, Integer userId, UserIn userIn) {
-    Event event = eventRepo.findByPrettyName(eventName);
+  public SubscriptionOut createSubscription(String prettyName, Integer userId, UserIn userIn) {
+    Event event = eventRepo.findByPrettyName(prettyName);
     if (event == null) {
-      throw new EventNotFoundException("Evento " + eventName + " nao existe.");
+      throw new SubscriptionEventNotFoundException("Event " + prettyName + " not found.");
     }
     User userRec = userRepo.findByEmail(userIn.email());
     if (userRec == null) {
@@ -60,7 +61,7 @@ public class SubscriptionService {
       indicator = userRepo.findById(userId).orElse(null);
     }
     if (indicator == null && userId != null) {
-      throw new UserIndicatorNotFoundException("Usuario " + userId + " indicador nao existe.");
+      throw new UserIndicatorNotFoundException("User indicator " + userId + " not found.");
     }
 
     Subscription subs = new Subscription();
@@ -71,17 +72,17 @@ public class SubscriptionService {
     Subscription sub = subRepo.findByEventAndSubscriber(event, userRec);
     if (sub != null) {
       throw new SubscriptionConflictException(
-          "Ja existe inscricao para o usuario "
+          "There is already a registration for the user "
               + userRec.getEmail()
-              + " no evento "
+              + " in event "
               + event.getTitle());
     }
 
     subRepo.save(subs);
     emailSubscrionCompleted.execute(
         userRec.getEmail(),
-        "Inscricão para o evento " + event.getTitle(),
-        userRec.getName() + ", sua inscrição foi confirmada com sucesso.");
+        "Registration for event " + event.getTitle(),
+        userRec.getName() + ", your registration has been successfully confirmed.");
 
     return new SubscriptionOut(
         subs.getSubscriptionNumber(),
