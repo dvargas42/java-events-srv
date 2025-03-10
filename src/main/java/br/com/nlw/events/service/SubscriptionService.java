@@ -5,7 +5,7 @@ import br.com.nlw.events.dto.SubscriptionRankingByUser;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
 import br.com.nlw.events.dto.UserIn;
 import br.com.nlw.events.email.EmailSubscrionCompleted;
-import br.com.nlw.events.exception.EventNotFoundException;
+import br.com.nlw.events.exception.RankingEventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.SubscriptionEventNotFoundException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
@@ -92,11 +92,11 @@ public class SubscriptionService {
             + subs.getSubscriber().getId());
   }
 
-  @Cacheable(value = "ranking", key = "'rankingList'", cacheManager = "cacheManager")
+  @Cacheable(value = "ranking", key = "#prettyName", cacheManager = "cacheManager")
   public List<SubscriptionRankingItem> getCompleteRanking(String prettyName) {
     Event event = eventRepo.findByPrettyName(prettyName);
     if (event == null) {
-      throw new EventNotFoundException("Ranking do evento " + prettyName + " não existe.");
+      throw new RankingEventNotFoundException("Ranking of event " + prettyName + " not found.");
     }
     return subRepo.generateRanking(event.getEventId());
   }
