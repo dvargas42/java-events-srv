@@ -30,12 +30,7 @@ public class EventController implements IEventController {
   @PostMapping
   public ResponseEntity<?> addNewEvent(
       @RequestBody @Valid EventIn eventIn, UriComponentsBuilder uriBuilder) {
-    EventOut eventOut = null;
-    try {
-      eventOut = service.addNewEvent(eventIn);
-    } catch (EventConflictException ex) {
-      return ResponseEntity.status(409).body(new ErrorMessage(ex.getMessage()));
-    }
+    EventOut eventOut = service.addNewEvent(eventIn);
     URI uri = uriBuilder.path("/event/{id}").buildAndExpand(eventOut.eventId()).toUri();
     return ResponseEntity.created(uri).body(eventOut);
   }
