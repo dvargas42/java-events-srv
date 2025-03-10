@@ -11,6 +11,7 @@ import br.com.nlw.events.dto.SubscriptionOut;
 import br.com.nlw.events.dto.SubscriptionRankingByUser;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
 import br.com.nlw.events.dto.UserIn;
+import br.com.nlw.events.error.ApiErrorResponse;
 import br.com.nlw.events.service.EventService;
 import br.com.nlw.events.service.SubscriptionService;
 import java.time.LocalDate;
@@ -100,16 +101,17 @@ class SubscriptionControllerGetIT {
   @Order(3)
   void shouldGetRankingWhenEventNotExists() {
     String invalidPrettyName = prettyName + "-invalid";
-    ResponseEntity<ErrorMessage> response =
+    ResponseEntity<ApiErrorResponse> response =
         restTemplate.getForEntity(
-            "/subscription/{prettyName}/ranking", ErrorMessage.class, invalidPrettyName);
+            "/subscription/{prettyName}/ranking", ApiErrorResponse.class, invalidPrettyName);
+
     if (response.getBody() == null) {
       fail("Response body is null");
     }
-    String expectedMessage = "Ranking do evento " + invalidPrettyName + " não existe.";
+    String expectedMessage = "Ranking of event " + invalidPrettyName + " not found.";
 
     assertEquals(404, response.getStatusCode().value());
-    assertEquals(expectedMessage, response.getBody().message());
+    assertEquals(expectedMessage, response.getBody().getErrorMessage());
   }
 
   @Test
