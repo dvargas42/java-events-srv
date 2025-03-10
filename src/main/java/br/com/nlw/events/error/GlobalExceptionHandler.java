@@ -1,5 +1,12 @@
 package br.com.nlw.events.error;
 
+import br.com.nlw.events.exception.AISearchInvalidQueryException;
+import br.com.nlw.events.exception.EventConflictException;
+import br.com.nlw.events.exception.EventNotFoundException;
+import br.com.nlw.events.exception.RankingEventNotFoundException;
+import br.com.nlw.events.exception.SubscriptionConflictException;
+import br.com.nlw.events.exception.SubscriptionEventNotFoundException;
+import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -7,13 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-
-import br.com.nlw.events.exception.AISearchInvalidQueryException;
-import br.com.nlw.events.exception.EventConflictException;
-import br.com.nlw.events.exception.EventNotFoundException;
-import br.com.nlw.events.exception.SubscriptionConflictException;
-import br.com.nlw.events.exception.SubscriptionEventNotFoundException;
-import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,16 +43,23 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(SubscriptionEventNotFoundException.class)
   public ResponseEntity<Object> handleSubscriptionEventNotFoundException(
       SubscriptionEventNotFoundException ex, WebRequest request) {
-    ApiErrorResponse errorResponse = 
+    ApiErrorResponse errorResponse =
         new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     return buildResponseEntity(errorResponse);
   }
 
-  
+  @ExceptionHandler(RankingEventNotFoundException.class)
+  public ResponseEntity<Object> handleRankingEventNotFoundException(
+      RankingEventNotFoundException ex, WebRequest request) {
+    ApiErrorResponse errorResponse =
+        new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
+  }
+
   @ExceptionHandler(UserIndicatorNotFoundException.class)
   public ResponseEntity<Object> handleUserIndicatorNotFoundException(
       UserIndicatorNotFoundException ex, WebRequest request) {
-    ApiErrorResponse errorResponse = 
+    ApiErrorResponse errorResponse =
         new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     return buildResponseEntity(errorResponse);
   }
