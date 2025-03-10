@@ -24,7 +24,7 @@ public class EventService {
     String prettyName = eventIn.title().toLowerCase().replace(" ", "-");
     Event foundEvent = eventRepo.findByPrettyName(prettyName);
     if (foundEvent != null) {
-      throw new EventConflictException("Já existe cadastro para o evento " + foundEvent.getTitle());
+      throw new EventConflictException("There is already a registration for the event " + foundEvent.getTitle());
     }
     Event event = eventMapper.toEntity(eventIn);
     event.setPrettyName(prettyName);
