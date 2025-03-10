@@ -1,13 +1,8 @@
 package br.com.nlw.events.controller;
 
-import br.com.nlw.events.dto.ErrorMessage;
-import br.com.nlw.events.dto.EventIn;
-import br.com.nlw.events.dto.EventOut;
-import br.com.nlw.events.exception.EventConflictException;
-import br.com.nlw.events.service.EventService;
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import br.com.nlw.events.dto.EventIn;
+import br.com.nlw.events.dto.EventOut;
+import br.com.nlw.events.service.EventService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/event")
@@ -41,11 +41,7 @@ public class EventController implements IEventController {
   }
 
   @GetMapping("/{prettyName}")
-  public ResponseEntity<?> getByPrettyName(@PathVariable(name = "prettyName") String id) {
-    EventOut eventOut = service.getByPrettyName(id);
-    if (eventOut != null) {
-      return ResponseEntity.ok().body(eventOut);
-    }
-    return ResponseEntity.notFound().build();
+  public ResponseEntity<EventOut> getByPrettyName(@PathVariable(name = "prettyName") String title) {
+    return ResponseEntity.ok().body(service.getByPrettyName(title));
   }
 }
