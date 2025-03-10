@@ -1,6 +1,8 @@
 package br.com.nlw.events.error;
 
 import br.com.nlw.events.exception.AISearchInvalidQueryException;
+import br.com.nlw.events.exception.EventConflictException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +18,12 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
     ApiErrorResponse errorResponse =
         new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    return buildResponseEntity(errorResponse);
+  }
+
+  @ExceptionHandler(EventConflictException.class)
+  public ResponseEntity<Object> handleEventConflictException(EventConflictException ex, WebRequest request) {
+    ApiErrorResponse errorResponse = new ApiErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     return buildResponseEntity(errorResponse);
   }
 
