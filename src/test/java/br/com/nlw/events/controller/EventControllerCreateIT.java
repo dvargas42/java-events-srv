@@ -69,7 +69,8 @@ class EventControllerCreateIT {
     ResponseEntity<String> response = restTemplate.postForEntity("/event", eventIn, String.class);
 
     assertEquals(409, response.getStatusCode().value());
-    assertThat(response.getBody()).contains("Já existe cadastro para o evento " + eventIn.title());
+    assertThat(response.getBody())
+        .contains("There is already a registration for the event " + eventIn.title());
   }
 
   static Stream<String> provideInvalidEntries() {
