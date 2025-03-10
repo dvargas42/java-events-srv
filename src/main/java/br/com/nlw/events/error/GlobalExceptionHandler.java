@@ -1,8 +1,5 @@
 package br.com.nlw.events.error;
 
-import br.com.nlw.events.exception.AISearchInvalidQueryException;
-import br.com.nlw.events.exception.EventConflictException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -10,6 +7,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+
+import br.com.nlw.events.exception.AISearchInvalidQueryException;
+import br.com.nlw.events.exception.EventConflictException;
+import br.com.nlw.events.exception.EventNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,9 +23,18 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(EventConflictException.class)
-  public ResponseEntity<Object> handleEventConflictException(EventConflictException ex, WebRequest request) {
-    ApiErrorResponse errorResponse = new ApiErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+  public ResponseEntity<Object> handleEventConflictException(
+      EventConflictException ex, WebRequest request) {
+    ApiErrorResponse errorResponse =
+        new ApiErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     return buildResponseEntity(errorResponse);
+  }
+
+  @ExceptionHandler(EventNotFoundException.class)
+  public ResponseEntity<Void> handleEventNotFoundException(
+      EventNotFoundException ex, WebRequest request) {
+    new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    return ResponseEntity.notFound().build();
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
