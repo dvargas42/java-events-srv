@@ -14,6 +14,6 @@ public class AIConfig {
 
   @Bean
   public OpenAiService openAiService() {
-    return new OpenAiService(apiKey, Duration.ofSeconds(60));
+    return new OpenAiService(apiKey, Duration.ofSeconds(120)); // 2 minutes
   }
 }
