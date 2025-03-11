@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: events-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: events-db
+    ports:
+      - "3306:3306"
+    networks:
+      - network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pmysql"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+  
+  redis:
+    image: redis:7.4
+    container_name: events-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - network
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis", "ping"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  sonarqube:
+    image: sonarqube
+    container_name: events-sonarqube
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonarqube-db
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+    networks:
+      - network
+
+  postgres:
+    image: postgres:15
+    container_name: events-sonarqube-db
+    restart: always
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar -d sonarqube-db"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+  
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: events-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - network
+    extra_hosts:
+      - "host.docker.internal:172.22.0.1"
+  
+  grafana:
+    image: grafana/grafana:11.5.2
+    container_name: events-grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - network
+
+volumes:
+  postgres_data:
+  redis_data:
+  mysql_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_temp:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  network:
+    driver: bridge
