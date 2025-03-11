@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import br.com.nlw.events.config.TestCacheConfig;
-import br.com.nlw.events.dto.ErrorMessage;
 import br.com.nlw.events.dto.EventIn;
 import br.com.nlw.events.dto.SubscriptionOut;
 import br.com.nlw.events.dto.SubscriptionRankingByUser;
@@ -122,20 +121,20 @@ class SubscriptionControllerGetIT {
         subscriptionService.createSubscription(prettyName, null, indicatorUser);
 
     int userId = subscription.subscriptionNumber();
-    ResponseEntity<ErrorMessage> response =
+    ResponseEntity<ApiErrorResponse> response =
         restTemplate.getForEntity(
             "/subscription/{prettyName}/ranking/{userId}",
-            ErrorMessage.class,
+            ApiErrorResponse.class,
             prettyName,
             String.valueOf(userId));
 
     if (response.getBody() == null) {
       fail("Response body is null");
     }
-    String expectedMessage = "Não há inscrições com indicação para o usuario " + userId;
+    String expectedMessage = "There are no entries indicating the user " + userId;
 
     assertEquals(404, response.getStatusCode().value());
-    assertEquals(expectedMessage, response.getBody().message());
+    assertEquals(expectedMessage, response.getBody().getErrorMessage());
   }
 
   @Test
