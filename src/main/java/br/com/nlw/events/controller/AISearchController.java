@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/ai-search")
-public class AISearchController {
+public class AISearchController implements IAISearchController{
 
   private final AISearchService aiService;
 
