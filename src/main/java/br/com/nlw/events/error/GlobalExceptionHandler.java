@@ -1,6 +1,8 @@
 package br.com.nlw.events.error;
 
+import br.com.nlw.events.exception.AISearchInvalidAPIKeyException;
 import br.com.nlw.events.exception.AISearchInvalidQueryException;
+import br.com.nlw.events.exception.AISearchSendChatException;
 import br.com.nlw.events.exception.EventConflictException;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.RankingEventNotFoundException;
@@ -61,6 +63,22 @@ public class GlobalExceptionHandler {
       UserIndicatorNotFoundException ex, WebRequest request) {
     ApiErrorResponse errorResponse =
         new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
+  }
+
+  @ExceptionHandler(AISearchInvalidAPIKeyException.class)
+  public ResponseEntity<Object> handleAISearchInvalidAPIKeyException(
+    AISearchInvalidAPIKeyException ex, WebRequest request) {
+    ApiErrorResponse errorResponse =
+        new ApiErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    return buildResponseEntity(errorResponse);
+  }
+
+  @ExceptionHandler(AISearchSendChatException.class)
+  public ResponseEntity<Object> handleAISearchSendChatException(
+    AISearchSendChatException ex, WebRequest request) {
+    ApiErrorResponse errorResponse =
+        new ApiErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
     return buildResponseEntity(errorResponse);
   }
 
