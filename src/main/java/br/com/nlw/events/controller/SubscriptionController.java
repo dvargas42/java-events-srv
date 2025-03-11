@@ -1,9 +1,7 @@
 package br.com.nlw.events.controller;
 
-import br.com.nlw.events.dto.ErrorMessage;
 import br.com.nlw.events.dto.SubscriptionRankingItem;
 import br.com.nlw.events.dto.UserIn;
-import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 import br.com.nlw.events.service.SubscriptionService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -46,10 +44,6 @@ public class SubscriptionController implements ISubscriptionController {
   @GetMapping("/{prettyName}/ranking/{userId}")
   public ResponseEntity<?> generateRankingByUserId(
       @PathVariable String prettyName, @PathVariable Integer userId) {
-    try {
-      return ResponseEntity.ok(service.getRankingByUser(prettyName, userId));
-    } catch (UserIndicatorNotFoundException ex) {
-      return ResponseEntity.status(404).body(new ErrorMessage(ex.getMessage()));
-    }
+    return ResponseEntity.ok(service.getRankingByUser(prettyName, userId));
   }
 }
