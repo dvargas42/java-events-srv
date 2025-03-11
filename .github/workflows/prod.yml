@@ -7,6 +7,38 @@ on:
         branches: [master]
 
 jobs:
+    coverage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Java
+              uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: 21
+
+            - name: Run coverage
+              run: mvn clean test jacoco:report
+              env:
+                SPRING_PROFILES_ACTIVE: test
+
+            - name: Generate Badge
+              uses: cicirello/jacoco-badge-generator@v2
+              with:
+                jacoco-csv-file: target/site/jacoco/jacoco.csv
+                generate-coverage-badge: true
+
+            - name: Commit Badge
+              run: |
+                git config --global user.name "github-actions"
+                git config --global user.email "github-actions@github.com"
+                git add .github/badges/*.svg
+                git commit -m "Updating coverage badges"
+                git push
+
+
     unit-test:
         runs-on: ubuntu-latest
         steps:
