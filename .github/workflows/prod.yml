@@ -20,7 +20,7 @@ jobs:
                 java-version: 21
 
             - name: Run coverage
-              run: mvn clean verify -Pcoverage
+              run: mvn clean verify jacoco:report
               env:
                 SPRING_PROFILES_ACTIVE: test
   
