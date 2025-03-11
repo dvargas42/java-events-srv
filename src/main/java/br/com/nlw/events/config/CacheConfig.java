@@ -16,7 +16,7 @@ public class CacheConfig {
   public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
     RedisCacheConfiguration config =
         RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(2)) // Define a expiração
+            .entryTtl(Duration.ofMinutes(2)) // 2 minutes for expiration
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
                     new GenericJackson2JsonRedisSerializer()));
